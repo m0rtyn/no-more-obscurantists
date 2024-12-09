@@ -113,10 +113,10 @@ const App: Component = () => {
     setLoading(true);
     openai
       .createCompletion({
-        model: "text-davinci-003",
+        model: "gpt-4o-mini",
         prompt,
         max_tokens: 2000, // the max number of tokens to generate
-        temperature: 0, // a measure of randomness
+        temperature: 1, // a measure of randomness
         top_p: 1.0, // the probability of choosing the next token
         frequency_penalty: 0.0,
         presence_penalty: 0.0,
