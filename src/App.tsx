@@ -7,7 +7,7 @@ import {
   OpenAIApi,
 } from "openai";
 
-const OPENAI_API_KEY = import.meta.env.OPENAI_KEY;
+const OPENAI_API_KEY = import.meta.env.VITE_OPENAI_KEY;
 
 /**
  * 1. Генерит рандомную карту таро
