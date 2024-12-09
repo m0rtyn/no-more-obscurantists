@@ -1,13 +1,9 @@
 import { Component, createEffect, createSignal } from "solid-js";
 import styles from "./App.module.css";
-import { SwipeCard } from "solid-swipe-card";
-import {
-  Configuration,
-  CreateCompletionRequestPrompt,
-  OpenAIApi,
-} from "openai";
+import OpenAI from "openai";
+import { SwipeCard } from "./SwipeCard";
 
-const OPENAI_API_KEY = import.meta.env.VITE_OPENAI_KEY;
+const OPENAI_API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
 
 /**
  * 1. Генерит рандомную карту таро
@@ -16,10 +12,10 @@ const OPENAI_API_KEY = import.meta.env.VITE_OPENAI_KEY;
  * 4. Повторяем это, а спустя три-пять карт появляется полный текст предсказания.
  */
 
-const configuration = new Configuration({
+const openai = new OpenAI({
   apiKey: OPENAI_API_KEY,
+  dangerouslyAllowBrowser: true,
 });
-const openai = new OpenAIApi(configuration);
 
 interface Card {
   name: string;
@@ -72,8 +68,8 @@ const getRandomCards = (size = 1) => {
   });
 };
 
-const generatePrompt = (cards: Card[]): CreateCompletionRequestPrompt => {
-  return `Please read the Tarot cards for me. Here are the cards I've been dealt: ${cards
+const generatePrompt = (cards: Card[]) => {
+  return `You're old Tarot Obcurantist. Please read the Tarot cards for me. Send the answer without any formatting but breaked by new lines. Here are the cards I've been dealt: ${cards
     .map((c) => c.name)
     .join(", ")}. What do they mean?`;
 };
@@ -111,10 +107,10 @@ const App: Component = () => {
     const prompt = generatePrompt(choosenCards());
 
     setLoading(true);
-    openai
-      .createCompletion({
+    openai.chat.completions
+      .create({
         model: "gpt-4o-mini",
-        prompt,
+        messages: [{ role: "system", content: prompt }],
         max_tokens: 2000, // the max number of tokens to generate
         temperature: 1, // a measure of randomness
         top_p: 1.0, // the probability of choosing the next token
@@ -122,7 +118,9 @@ const App: Component = () => {
         presence_penalty: 0.0,
       })
       .then((completion) => {
-        setCompletion(completion?.data?.choices?.[0]?.text || "No answer 🤷‍♂️");
+        setCompletion(
+          completion?.choices?.[0].message.content || "No answer 🤷‍♂️"
+        );
         setLoading(false);
       })
       .catch((err) => {
@@ -138,7 +136,23 @@ const App: Component = () => {
         <h1>No more Obsurantists!</h1>
       </header>
 
-      <main>
+      <main class={styles.main}>
+        <div class={styles.prophecyBox}>
+          {loading() ? "Please wait, I'm thinking" : ""}
+
+          {completion().length > 0 && (
+            <ul>
+              {completion()
+                .replace(/^\n\n/, "")
+                .split("\n\n")
+                .map((line) => (
+                  <li class={styles.prediction}>{line}</li>
+                ))}
+            </ul>
+          )}
+        </div>
+
+        <h3>Swipe your cards, my child</h3>
         <div class={styles.deck}>
           {cards().map((card) => (
             <SwipeCard
@@ -161,24 +175,13 @@ const App: Component = () => {
           Send prompt
         </button>
 
-        {choosenCards().map((card) => (
-          <div class={[styles.card, styles.choosenCard].join(" ")}>
-            <img src={card.imgUrl} />
-          </div>
-        ))}
-
-        <div>
-          {loading() ? "Loading..." : ""}
-          {completion().length > 0 && (
-            <ul class="prediction">
-              {completion()
-                .replace(/^\n\n/, "")
-                .split("\n\n")
-                .map((line) => (
-                  <li>{line}</li>
-                ))}
-            </ul>
-          )}
+        <div class={styles.choosenCards}>
+          {choosenCards().length === 0 && "no cards"}
+          {choosenCards().map((card) => (
+            <div class={[styles.card, styles.choosenCard].join(" ")}>
+              <img src={card.imgUrl} />
+            </div>
+          ))}
         </div>
       </main>
     </div>

@@ -13,13 +13,14 @@ main {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  gap: 2rem;
 }
 
 .card {
   border-radius: 16px;
   background-color: black;
   /* width: 300px; */
-  height: 100%;
+  height: 300px;
   width: auto;
   /* position: absolute; */
   overflow: hidden;
@@ -41,9 +42,10 @@ main {
 .deck {
   display: flex;
   flex-wrap: wrap;
+  /* flex-direction: column; */
   justify-content: center;
   position: relative;
-  height: 500px;
+  gap: 1rem;
 }
 
 .sendPromptButton {
@@ -56,4 +58,25 @@ main {
   margin: 2rem;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
+}
+
+.prediction {
+  text-align: start;
+  padding: 0.3rem;
+}
+
+.prophecyBox {
+  width: 80%;
+  padding: 0.3rem 1rem;
+  border: 3px solid black;
+  max-height: 10rem;
+  height: 10rem;
+  overflow: hidden;
+  overflow-y: auto;
+  border-radius: 3rem;
+  box-shadow: inset 0 0 100px 10px palegoldenrod;
+}
+
+.choosenCards {
+  display: flex;
 }
