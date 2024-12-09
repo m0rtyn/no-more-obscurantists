@@ -7,11 +7,11 @@ import {
   OpenAIApi,
 } from "openai";
 
-const OPENAI_API_KEY = "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";
+const OPENAI_API_KEY = import.meta.env.OPENAI_KEY;
 
 /**
  * 1. Генерит рандомную карту таро
- * 2. Под картой появляется текст от GPT-3
+ * 2. Под картой появляется текст от ChatGPT
  * 3. Юзер свайпает карту, снова выбирается случайная карта и появляется продолжение предсказания
  * 4. Повторяем это, а спустя три-пять карт появляется полный текст предсказания.
  */
@@ -107,11 +107,11 @@ const App: Component = () => {
   };
 
   const sendPrompt = () => {
-    console.debug("🚀 ~ sendPrompt ~ prompt");
+    // console.debug("🚀 ~ sendPrompt ~ prompt");
     const prompt = generatePrompt(choosenCards());
 
     setLoading(true);
-    const completion = openai
+    openai
       .createCompletion({
         model: "text-davinci-003",
         prompt,
@@ -171,7 +171,8 @@ const App: Component = () => {
           {loading() ? "Loading..." : ""}
           {completion().length > 0 && (
             <ul class="prediction">
-              {completion().replace(/^\n\n/, "")
+              {completion()
+                .replace(/^\n\n/, "")
                 .split("\n\n")
                 .map((line) => (
                   <li>{line}</li>
